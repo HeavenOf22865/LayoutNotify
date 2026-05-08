@@ -42,7 +42,6 @@ def get_layout(layouts):
 
 
 def hide_window():
-
     if root:
         root.withdraw()
 
