@@ -1,5 +1,7 @@
+import os
 import threading
 import tomllib
+from pathlib import Path
 from time import sleep
 
 import customtkinter as ctk
@@ -11,7 +13,18 @@ current_window = None
 
 
 def load_layouts_from_config():
-    with open("config.toml", "rb") as f:
+    config_dir = Path.home() / ".config" / "LayoutNotify"
+    config_path = config_dir / "config.toml"
+
+    if not config_dir.exists():
+        config_dir.mkdir(parents=True, exist_ok=True)
+
+    if not config_path.exists():
+        default_config = '[layouts]\n"1033" = "EN-en"\n"1049" = "RU-ru"\n'
+
+        config_path.write_text(default_config, encoding="utf-8")
+
+    with open(config_path, "rb") as f:
         config = tomllib.load(f)
 
     layouts = config["layouts"]
