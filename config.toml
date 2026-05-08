@@ -1,0 +1,4 @@
+#Config file example
+[layouts]
+"1033" = "EN-en"
+"1049" = "RU-ru"

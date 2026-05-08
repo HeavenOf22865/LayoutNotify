@@ -1,4 +1,5 @@
 import threading
+import tomllib
 from time import sleep
 
 import customtkinter as ctk
@@ -9,25 +10,30 @@ import win32process
 current_window = None
 
 
-def get_layout():
+def load_layouts_from_config():
+    with open("config.toml", "rb") as f:
+        config = tomllib.load(f)
+
+    layouts = config["layouts"]
+
+    return layouts
+
+
+def get_layout(layouts):
     hwnd = win32gui.GetForegroundWindow()
 
     thread_id, _ = win32process.GetWindowThreadProcessId(hwnd)
 
     layout_id_full = win32api.GetKeyboardLayout(thread_id)
 
-    layout_id = layout_id_full & 0xFFFF
+    layout_id = str(layout_id_full & 0xFFFF)
 
-    if layout_id == 0x0409:
-        layout = "EN-en"
+    layout = ""
 
-    elif layout_id == 0x0419:
-        layout = "RU-ru"
+    if layout_id in layouts:
+        layout = layouts[layout_id]
 
-    else:
-        layout = "Unknown"
-
-    return layout
+    return layout, layout_id
 
 
 def show_notification(layout):
@@ -45,6 +51,7 @@ def show_notification(layout):
 
     root.overrideredirect(True)
     root.attributes("-topmost", True)
+    root.attributes("-toolwindow", True)
     root.attributes("-alpha", 0.75)
 
     root.configure(fg_color="#2B2B2B")
@@ -79,16 +86,20 @@ def show_notification(layout):
 
 
 def main():
-    layout_buffer = get_layout()
+    layouts = load_layouts_from_config()
+
+    layout_buffer, layout_id_buffer = get_layout(layouts)
 
     while True:
-        current_layout = get_layout()
+        current_layout, current_layout_id = get_layout(layouts)
 
-        if current_layout != layout_buffer:
-            layout_buffer = current_layout
+        if current_layout_id != layout_id_buffer:
+            layout_buffer, layout_id_buffer = current_layout, current_layout_id
 
             threading.Thread(
-                target=show_notification, args=(current_layout,), daemon=True
+                target=show_notification,
+                args=(current_layout,),
+                daemon=True,
             ).start()
 
         sleep(0.1)
