@@ -1,7 +1,6 @@
 import os
 import threading
 import tomllib
-from optparse import Option
 from pathlib import Path
 from time import sleep
 
