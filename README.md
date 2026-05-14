@@ -1,6 +1,6 @@
 LayoutNotify is a simple python utility that displays a notification whenever your keyboard layout changes.
 
-![Example:](https://github.com/HeavenOf22865/LayoutNotify/image.png)
+![Example](image.png)
 
 Libraries used:
 - [pywin32](https://pypi.org/project/pywin32/)
