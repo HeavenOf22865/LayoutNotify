@@ -7,6 +7,8 @@ requires-python = ">=3.14"
 dependencies = [
     "auto-py-to-exe>=2.50.1",
     "customtkinter>=5.2.2",
+    "pillow>=12.2.0",
+    "pystray>=0.19.5",
     "pywin32>=311",
 ]
 

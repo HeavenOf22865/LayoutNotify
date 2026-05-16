@@ -1,13 +1,17 @@
 import os
+import sys
 import threading
 import tomllib
+import winreg
 from pathlib import Path
 from time import sleep
 
 import customtkinter as ctk
+import pystray as tray
 import win32api
 import win32gui
 import win32process
+from PIL import Image
 
 root = None
 label = None
@@ -74,7 +78,76 @@ def check_layout():
         root.after(100, check_layout)
 
 
+def is_in_startup():
+    key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+    try:
+        with winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_READ
+        ) as key:
+            winreg.QueryValueEx(key, "LayoutNotify")
+            return True
+    except FileNotFoundError:
+        return False
+
+
+def toggle_startup():
+    key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
+    if is_in_startup():
+        with winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE
+        ) as key:
+            try:
+                winreg.DeleteValue(key, "LayoutNotify")
+            except FileNotFoundError:
+                pass
+    else:
+        app_path = os.path.abspath(sys.argv[0])
+
+        with winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE
+        ) as key:
+            winreg.SetValueEx(key, "LayoutNotify", 0, winreg.REG_SZ, f'"{app_path}"')
+
+
+def init_tray_icon():
+    image_path = resource_path("icon.ico")
+
+    image = Image.open(image_path)
+
+    tray_icon = tray.Icon(
+        "LayoutNotify",
+        icon=image,
+        menu=tray.Menu(
+            tray.MenuItem(
+                "Load On Startup",
+                action=toggle_startup,
+                checked=lambda item: is_in_startup(),
+            ),
+            tray.MenuItem("Exit", action=lambda: exit(tray_icon)),
+        ),
+    )
+
+    tray_icon.run()
+
+
+def resource_path(relative_path):
+    base_path = getattr(sys, "_MEIPASS", os.path.abspath("."))
+    return os.path.join(base_path, relative_path)
+
+
+def exit(icon):
+    global root
+    icon.stop()
+    if root:
+        root.quit()
+
+
 def main():
+    tray_thread = threading.Thread(target=init_tray_icon, daemon=True)
+
+    tray_thread.start()
+
     global root, label, layouts, layout_id_buffer
 
     layouts = load_layouts_from_config()
