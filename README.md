@@ -11,5 +11,5 @@ Example image:
 - [customtkinter](https://github.com/tomschimansky/customtkinter)
 - [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/)
 - [uv](https://github.com/astral-sh/uv)
-- [Pillow](https://pypi.org/project/pillow/)
-- [Pystray](https://pypi.org/project/pystray/)
+- [pillow](https://pypi.org/project/pillow/)
+- [pystray](https://pypi.org/project/pystray/)
