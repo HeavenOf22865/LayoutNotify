@@ -6,7 +6,7 @@ Example image:
 
 ![Example](image.png)
 
-## Libraries used:
+## Libraries used
 - [pywin32](https://pypi.org/project/pywin32/)
 - [customtkinter](https://github.com/tomschimansky/customtkinter)
 - [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/)
